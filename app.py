@@ -1,3 +1,9 @@
+from dotenv import load_dotenv
+import os
+load_dotenv()
+# Now the OS can see the key
+api_key = os.getenv("OPENAI_API_KEY")
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
