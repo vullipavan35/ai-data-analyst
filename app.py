@@ -1,20 +1,19 @@
-from dotenv import load_dotenv
-import os
-load_dotenv()
-# Now the OS can see the key
-api_key = os.getenv("OPENAI_API_KEY")
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from langchain_openai import ChatOpenAI
 import os
 
-# --- 1. DATA CLEANING ENGINE ---
+# --- 1. SETTINGS & SECRETS ---
+st.set_page_config(page_title="AI Data Analyst", layout="wide", page_icon="📊")
+
+# This looks for the key in Streamlit Cloud "Secrets"
+api_key = st.secrets.get("OPENAI_API_KEY")
+
+# --- 2. DATA CLEANING ENGINE ---
 def clean_data(df):
-    # Remove duplicates
     df = df.drop_duplicates()
-    # Fill numeric with median, categorical with "Unknown"
+    # Fill numbers with median, text with 'Unknown'
     for col in df.columns:
         if df[col].dtype in ['int64', 'float64']:
             df[col] = df[col].fillna(df[col].median())
@@ -22,30 +21,44 @@ def clean_data(df):
             df[col] = df[col].fillna("Unknown")
     return df
 
-# --- 2. SMART AI AGENT (Q&A) ---
-def ask_ai(df, question):
+# --- 3. SMART Q&A ENGINE ---
+def run_ai_agent(df, question):
+    if not api_key or "sk-" not in api_key:
+        return "❌ Error: OpenAI API Key is missing or invalid in Streamlit Secrets."
+    
     try:
-        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-        # We prompt the LLM to write Python code to answer the question
-        prompt = f"""
-        You are a data analyst. Dataframe 'df' has columns: {df.columns.tolist()}.
-        Question: {question}
-        Return ONLY the Python code to solve this. 
-        Store the final answer in a variable called 'result'.
-        """
-        code = llm.invoke(prompt).content.replace("```python", "").replace("```", "")
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, openai_api_key=api_key)
         
+        # We ask the AI to write the Python code to answer the user
+        prompt = f"""
+        You are a expert Data Analyst. The dataframe is named 'df'.
+        Columns: {df.columns.tolist()}
+        Question: {question}
+        
+        Return ONLY valid Python code. 
+        Store the final answer in a variable named 'result'. 
+        If it's a number, format it nicely.
+        """
+        
+        response = llm.invoke(prompt)
+        code = response.content.replace("```python", "").replace("```", "").strip()
+        
+        # Execute the code safely
         local_vars = {"df": df}
         exec(code, {}, local_vars)
-        return local_vars.get("result", "I couldn't calculate that.")
+        return local_vars.get("result", "I processed the data but couldn't find a specific result.")
+        
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"⚠️ AI Error: {str(e)}"
 
-# --- 3. UI LAYOUT ---
-st.set_page_config(page_title="AI Data Dashboard", layout="wide")
-st.title("🤖 Automated Data Analyst & Dashboard")
+# --- 4. USER INTERFACE ---
+st.sidebar.title("📂 Data Portal")
+if not api_key:
+    st.sidebar.error("🔑 API Key Missing in Secrets")
+else:
+    st.sidebar.success("🔑 API Key Connected")
 
-uploaded_file = st.sidebar.file_uploader("Upload your Excel or CSV", type=['csv', 'xlsx'])
+uploaded_file = st.sidebar.file_uploader("Upload Excel or CSV", type=['csv', 'xlsx'])
 
 if uploaded_file:
     # Load Data
@@ -55,57 +68,53 @@ if uploaded_file:
         df = pd.read_excel(uploaded_file)
     
     df = clean_data(df)
-    st.success("✅ Data Uploaded & Cleaned Successfully!")
-
-    # --- TAB 1: Dashboard & KPIs ---
-    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🔍 Q&A Assistant", "📋 Raw Data"])
     
-    with tab1:
-        # KPI Row
-        cols = st.columns(4)
-        num_cols = df.select_dtypes(include='number').columns
-        cat_cols = df.select_dtypes(include='object').columns
+    # --- DASHBOARD SECTION ---
+    st.title("📊 Automated Data Dashboard")
+    
+    # KPI Totals
+    k1, k2, k3 = st.columns(3)
+    k1.metric("Total Records", f"{df.shape[0]:,}")
+    k2.metric("Total Columns", df.shape[1])
+    
+    num_cols = df.select_dtypes(include='number').columns
+    cat_cols = df.select_dtypes(include='object').columns
+    
+    if len(num_cols) > 0:
+        k3.metric("Avg Value", f"{df[num_cols[0]].mean():,.2f}")
 
-        cols[0].metric("Total Rows", df.shape[0])
-        cols[1].metric("Total Columns", df.shape[1])
-        if len(num_cols) > 0:
-            cols[2].metric("Numeric Fields", len(num_cols))
-            cols[3].metric("Avg Value", f"{df[num_cols[0]].mean():.2f}")
+    st.divider()
 
-        st.divider()
+    # TABS FOR ORGANIZATION
+    tab_dash, tab_qa, tab_raw = st.tabs(["📈 Visuals", "💬 AI Q&A", "📋 Raw Data"])
 
-        # Automatic Charts
-        c1, c2 = st.columns(2)
-        with c1:
-            if len(num_cols) > 0:
-                st.subheader("📈 Distribution (Histogram)")
-                fig_hist = px.histogram(df, x=num_cols[0], template="plotly_dark", color_discrete_sequence=['#6366f1'])
-                st.plotly_chart(fig_hist, use_container_width=True)
+    with tab_dash:
+        col1, col2 = st.columns(2)
         
-        with c2:
+        with col1:
+            if len(num_cols) > 0:
+                st.subheader(f"Distribution of {num_cols[0]}")
+                fig1 = px.histogram(df, x=num_cols[0], template="plotly_dark")
+                st.plotly_chart(fig1, use_container_width=True)
+        
+        with col2:
             if len(cat_cols) > 0 and len(num_cols) > 0:
-                st.subheader("🍕 Category Breakdown (Pie)")
-                # Grouping top 5 for clarity
-                top_5 = df.groupby(cat_cols[0])[num_cols[0]].sum().nlargest(5).reset_index()
-                fig_pie = px.pie(top_5, names=cat_cols[0], values=num_cols[0], hole=0.4)
-                st.plotly_chart(fig_pie, use_container_width=True)
+                st.subheader("Top 5 Categories")
+                top5 = df.groupby(cat_cols[0])[num_cols[0]].sum().nlargest(5).reset_index()
+                fig2 = px.pie(top5, names=cat_cols[0], values=num_cols[0], hole=0.3)
+                st.plotly_chart(fig2, use_container_width=True)
 
-        if len(cat_cols) > 0 and len(num_cols) > 0:
-            st.subheader("🔝 Top 10 Analysis (Bar Chart)")
-            top_10 = df.groupby(cat_cols[0])[num_cols[0]].sum().nlargest(10).reset_index()
-            fig_bar = px.bar(top_10, x=cat_cols[0], y=num_cols[0], color=num_cols[0])
-            st.plotly_chart(fig_bar, use_container_width=True)
-
-    # --- TAB 2: AI Q&A ---
-    with tab2:
-        st.subheader("💬 Ask anything about your data")
-        user_q = st.text_input("Example: What is the total revenue per region?")
-        if user_q:
-            with st.spinner("Analyzing..."):
-                answer = ask_ai(df, user_q)
-                st.write("### 💡 Answer:")
+    with tab_qa:
+        st.subheader("Ask your data a question")
+        user_input = st.text_input("e.g., 'What is the sum of sales for the North region?'")
+        if user_input:
+            with st.spinner("Thinking..."):
+                answer = run_ai_agent(df, user_input)
+                st.write("### 💡 AI Answer:")
                 st.info(answer)
 
-    # --- TAB 3: Raw Data ---
-    with tab3:
+    with tab_raw:
         st.dataframe(df)
+
+else:
+    st.info("👈 Please upload an Excel or CSV file in the sidebar to begin.")
