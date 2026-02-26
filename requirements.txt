@@ -1,6 +1,6 @@
+python-dotenv
 streamlit
 pandas
 plotly
-openai
 langchain-openai
-openpyxl
+openai
