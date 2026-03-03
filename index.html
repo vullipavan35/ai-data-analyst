@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pavan Vulli | Data Analyst Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: #f4f6f9;
+    color: #2c3e50;
+}
+header {
+    background: #0f172a;
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+}
+header h1 {
+    font-size: 40px;
+}
+.btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 25px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+}
+section {
+    padding: 60px 10%;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.skills, .projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.05);
+}
+.dashboard-img {
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #0f172a;
+    color: white;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Pavan Vulli</h1>
+    <p>Data Analyst | SQL | Power BI | Python | AWS</p>
+    <a href="#projects" class="btn">View My Analytics Work</a>
+</header>
+
+<section>
+    <h2>About Me</h2>
+    <p style="text-align:center; max-width:800px; margin:auto;">
+        Data-focused professional with 3+ years of backend development experience,
+        now specializing in Data Analytics. Strong in SQL, Power BI, Excel, and Python,
+        delivering KPI dashboards and business insights for decision-making.
+    </p>
+</section>
+
+<section>
+    <h2>Technical Skills</h2>
+    <div class="skills">
+        <div class="card"><h3>Data Analytics</h3><p>Power BI, SQL, Excel, Pandas, Data Cleaning</p></div>
+        <div class="card"><h3>Databases</h3><p>MySQL, PostgreSQL, Oracle</p></div>
+        <div class="card"><h3>Cloud</h3><p>AWS (S3, RDS, EC2)</p></div>
+        <div class="card"><h3>Backend Knowledge</h3><p>Java, Spring Boot (API & Data Handling)</p></div>
+    </div>
+</section>
+
+<section id="projects">
+    <h2>Power BI Dashboards</h2>
+    <div class="projects">
+        <div class="card">
+            <h3>📊 Sales Performance Dashboard</h3>
+            <p>
+                Built dynamic KPI dashboard tracking revenue, profit margin, and region-wise sales.
+                Implemented DAX measures and data transformation using Power Query.
+            </p>
+            <img src="dashboard1.png" alt="Sales Dashboard" class="dashboard-img">
+        </div>
+
+        <div class="card">
+            <h3>📈 Business Insights Dashboard</h3>
+            <p>
+                Created executive-level dashboard with trend analysis, YoY growth,
+                and customer segmentation insights.
+            </p>
+            <img src="dashboard2.png" alt="Business Dashboard" class="dashboard-img">
+        </div>
+
+        <div class="card">
+            <h3>⚙️ Data Engineering Mini Project</h3>
+            <p>
+                Designed ETL pipeline using SQL and Python for cleaning and transforming raw data.
+                Optimized queries for performance.
+            </p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    © 2026 Pavan Vulli | Email: yourmail@email.com
+</footer>
+
+</body>
+</html>
