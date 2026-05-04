@@ -1,29 +1,40 @@
 import streamlit as st
 import pandas as pd
-from charts import create_charts
-from insights import generate_ai_insights
-from kpi import show_kpis
-from filters import apply_filters
 
-st.set_page_config(page_title="Excel Data Analyst Agent", layout="wide")
+st.set_page_config(page_title="Auto Dashboard", layout="wide")
 
-st.title("📊 Excel Data Analyst Agent (Professional Version)")
+st.title("📊 Auto Dashboard Generator")
 
-uploaded_file = st.file_uploader("Upload Excel/CSV File", type=["xlsx", "csv"])
+file = st.file_uploader("Upload your dataset (CSV)", type=["csv"])
 
-if uploaded_file:
-    if uploaded_file.name.endswith(".csv"):
-        df = pd.read_csv(uploaded_file)
-    else:
-        df = pd.read_excel(uploaded_file)
+if file:
+df = pd.read_csv(file)
 
-    df = apply_filters(df)
+```
+st.subheader("Dataset Preview")
+st.dataframe(df.head())
 
-    st.subheader("📌 KPI Dashboard")
-    show_kpis(df)
+# KPI Section
+st.subheader("Key Metrics")
+col1, col2, col3 = st.columns(3)
 
-    st.subheader("📊 Visual Analytics")
-    create_charts(df)
+numeric_cols = df.select_dtypes(include='number').columns
 
-    st.subheader("🤖 AI Insights")
-    generate_ai_insights(df)
+if len(numeric_cols) >= 1:
+    col1.metric("Total", round(df[numeric_cols[0]].sum(), 2))
+if len(numeric_cols) >= 2:
+    col2.metric("Average", round(df[numeric_cols[1]].mean(), 2))
+if len(numeric_cols) >= 3:
+    col3.metric("Max", round(df[numeric_cols[2]].max(), 2))
+
+# Charts
+st.subheader("Visualizations")
+
+if len(numeric_cols) > 0:
+    st.line_chart(df[numeric_cols])
+
+cat_cols = df.select_dtypes(include='object').columns
+
+if len(cat_cols) > 0 and len(numeric_cols) > 0:
+    st.bar_chart(df.groupby(cat_cols[0])[numeric_cols[0]].sum())
+```
