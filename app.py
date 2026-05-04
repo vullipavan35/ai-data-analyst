@@ -9,7 +9,7 @@ st.title("🛒 Supermarket Sales Dashboard")
 file = st.file_uploader("Upload CSV", type=["csv"])
 
 if file is not None:
-df = pd.read_csv(file)
+    df = pd.read_csv(file)
 
 ```
 # ---- Data Preparation ----
