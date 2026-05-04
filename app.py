@@ -11,7 +11,6 @@ file = st.file_uploader("Upload CSV", type=["csv"])
 if file is not None:
     df = pd.read_csv(file)
 
-```
 # ---- Data Preparation ----
 df.columns = df.columns.str.strip()
 
