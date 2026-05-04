@@ -84,4 +84,4 @@ if product_col and sales_col:
 # ---- Raw Data ----
 st.subheader("📄 Data Preview")
 st.dataframe(df)
-```
+
