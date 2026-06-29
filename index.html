@@ -148,6 +148,21 @@ h1 em { font-style: italic; color: var(--teal); font-weight: 400; }
   border: 1px solid var(--border2); transition: all 0.25s; border-radius: 2px;
 }
 .btn-outline:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-3px); }
+  /* line 150 */
+.btn-outline:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-3px); }
+
+/* line 151 — paste here */
+.btn-resume {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 2px;
+  background: linear-gradient(135deg, #2dd4bf, #0891b2);
+  color: #0f1623; font-weight: 700; font-size: 12px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  text-decoration: none; transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(45,212,191,0.3);
+  border: 1px solid var(--teal);
+}
+.btn-resume:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(45,212,191,0.5); }
 
 /* Hero card */
 .hero-visual { position: relative; }
@@ -626,10 +641,11 @@ footer {
       <p class="hero-desc fade-up">
         Transforming raw data into actionable business insights through ETL pipelines, interactive dashboards, and advanced analytics. Bridging data engineering with storytelling.
       </p>
-      <div class="hero-btns fade-up">
-        <a href="#contact" class="btn-primary">Get in Touch &nbsp;→</a>
-        <a href="#projects" class="btn-outline">View Projects</a>
-      </div>
+     <div class="hero-btns fade-up">
+  <a href="#contact" class="btn-primary">Get in Touch &nbsp;→</a>
+  <a href="#projects" class="btn-outline">View Projects</a>
+  <a href="Vulli_Pavan_Resume.pdf" download="Vulli_Pavan_Resume.pdf" class="btn-resume">⬇ Download Resume</a>
+</div>
     </div>
     <div class="hero-visual fade-up">
       <div class="hero-card">
